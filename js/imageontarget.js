@@ -12,7 +12,8 @@ var World = {
 			Important: If you replace the tracker file with your own, make sure to change the target name accordingly.
 			Use a specific target name to respond only to a certain target or use a wildcard to respond to any or a certain group of targets.
 		*/
-		this.targetCollectionResource = new AR.TargetCollectionResource("assets/magazine.wtc", {
+
+		this.targetCollectionResource = new AR.TargetCollectionResource("assets/tracker.wtc", {
 			onLoaded:function(){
 				AR.logger.info("LOADED");
 			},
@@ -39,13 +40,21 @@ var World = {
 			translate: {
 				x:0
 			}
-
 		});
-
 		/*
 			The last line combines everything by creating an AR.ImageTrackable with the previously created tracker, the name of the image target and the drawable that should augment the recognized image.
 			Please note that in this case the target name is a wildcard. Wildcards can be used to respond to any target defined in the target collection. If you want to respond to a certain target only for a particular AR.ImageTrackable simply provide the target name as specified in the target collection.
 		*/
+
+    // var cloudRecognitionService = new AR.CloudRecognitionService("76cb320bdb3a5843c389ec8b897beaa8", "58f5da0a3a3a24801d93d273", {
+    //     onInitialized: function (params) {
+	// 		AR.logger.info(`Loaded`);
+	// 	},
+    //     onError: function (params) {
+	// 		AR.logger.info(`error ${params.message}`);
+	// 	}
+    // });
+
 		var pageOne = new AR.ImageTrackable(this.tracker, "*", {
 			drawables: {
 				cam: overlayOne
