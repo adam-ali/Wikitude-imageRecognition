@@ -3,6 +3,7 @@ var World = {
     cloudRecognitionService: null,
 
 	init: function initFn() {
+
 		this.createTracker();
 		this.createOverlays();
 	},
@@ -15,6 +16,7 @@ var World = {
 		function trackerError() is called instead.
 	*/
     createTracker: function createTrackerFn() {
+        
 		World.cloudRecognitionService = new AR.CloudRecognitionService("76cb320bdb3a5843c389ec8b897beaa8", "58f5da0a3a3a24801d93d273", {
 			onInitialized: this.trackerLoaded,
 			onError: this.trackerError
@@ -24,7 +26,17 @@ var World = {
             onError: this.trackerError
         });
 	},
-
+	/////////////////////////
+	startContinuousRecognition: function startContinuousRecognitionFn(interval) {
+		/*
+			With this function call the continuous recognition mode is started. It is passed four parameters, the first defines the interval in which
+			a new recognition is started. It is set in milliseconds and the minimum value is 500. The second parameter defines a callback function
+			that is called by the server if the recognition interval was set too high for the current network speed. The third parameter is again a callback which is fired
+			when a recognition cycle is completed. The fourth and last paramater defines another callback function that is called in case an error occured during the client/server interaction.
+		*/
+		this.cloudRecognitionService.startContinuousRecognition(interval, this.onInterruption, this.onRecognition, this.onRecognitionError);
+	},
+	////////////////////////////
 	/*
 		Callback function to handle CloudTracker initializition errors.
 	*/
@@ -33,13 +45,21 @@ var World = {
 	},
 
 	createOverlays: function createOverlaysFn() {
-		/*
+		
+        /*
 			To display a banner containing information about the current target as an augmentation an image resource is created and passed to the
 			AR.ImageDrawable. A drawable is a visual component that can be connected to an IR target (AR.ImageResource) or a geolocated
 			object (AR.GeoObject). The AR.ImageDrawable is initialized by the image and its size. Optional parameters allow to position it
 			relative to the recognized target.
 		*/
-		this.bannerImg = new AR.ImageResource("assets/banner.jpg");
+		this.bannerImg = new AR.ImageResource("assets/banner.jpg", {
+			onLoaded: function (params) {
+				AR.logger.info("IMAGE HAS BEEN LOADED")
+			},
+			onError: function (err) {
+				AR.logger.error(err);
+			}
+        });
 		this.bannerImgOverlay = new AR.ImageDrawable(this.bannerImg, 0.4, {
 			translate: {
 				y: -0.6
@@ -70,8 +90,15 @@ var World = {
 				object returned from the server the 'targetInfo.name' property is read to load the equally named image file.
 				The zOrder property (defaults to 0) is set to 1 to make sure it will be positioned on top of the banner.
 			*/
-			World.wineLabel = new AR.ImageResource("assets/" + response.targetInfo.name + ".jpg");
-			World.wineLabelOverlay = new AR.ImageDrawable(World.wineLabel, 0.3, {
+			World.wineLabel = new AR.ImageResource("assets/" + response.targetInfo.name + ".jpg",{
+				onLoaded: function (params) {
+				AR.logger.info("asset HAS BEEN LOADED")
+				},
+				onError: function (err) {
+					AR.logger.error(`error loading rescource ${err}`);
+				}
+			});
+			World.wineLabelOverlay = new AR.ImageDrawable(World.wineLabel, 0.27, {
 				translate: {
 					x: -0.5,
 					y: -0.6
@@ -92,19 +119,14 @@ var World = {
 					cam: [World.bannerImgOverlay, World.wineLabelOverlay]
 				}
 			});
-		} else {
-			/*
-				Image recognition failed. An error message will be displayed to the user.
-			*/
-			document.getElementById('errorMessage').innerHTML = "<div class='errorMessage'>Recognition failed, please try again!</div>";
-
-			setTimeout(function() {
-				var e = document.getElementById('errorMessage');
-				e.removeChild(e.firstChild);
-			}, 3000);
 		}
 	},
-
+	///////////////
+	onInterruption: function onInterruptionFn(suggestedInterval) {
+			World.cloudRecognitionService.stopContinuousRecognition();
+			World.cloudRecognitionService.startContinuousRecognition(suggestedInterval);
+	},
+/////////////////////
 	onRecognitionError: function onRecognitionError(errorCode, errorMessage) {
 		alert("error code: " + errorCode + " error message: " + JSON.stringify(errorMessage));
 	},
@@ -122,14 +144,16 @@ var World = {
 	},
 
 	trackerLoaded: function trackerLoadedFn() {
+		World.startContinuousRecognition(750);
 		World.showUserInstructions();
 	},
 
 	showUserInstructions: function showUserInstructionsFn() {
+       
 		var cssDivRight = " style='display: table-cell;vertical-align: middle; text-align: center;'";
 		document.getElementById('messageBox').innerHTML =
 			"<div" + cssDivRight + ">" +
-				"<h1>Scan Image now</h1>" +
+				"<h3>Scan Image now</h3>" +
 			"</div>";
 
 		setTimeout(function() {
@@ -138,5 +162,5 @@ var World = {
 		}, 10000);
 	}
 };
-
+AR.logger.activateDebugMode();
 World.init();

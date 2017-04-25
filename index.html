@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE HTML>
 <html>
 
@@ -11,11 +14,32 @@
 	<script type="text/javascript" src="js/ade.js"></script>
 
 	<link rel="stylesheet" href="css/default.css">
+
+	<!-- jquery mobile CSS -->
+ <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+
+    <!-- required to set background transparent & enable "click through" -->
+    <!--<link rel="stylesheet" href="css/x.css" />-->
+
+    <!-- jquery JS files -->
+  <!--<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script>-->
+  <!--<script type="text/javascript" src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>-->
+
+
 </head>
 
-<body>
-	<div id="loadingMessage" class="info">Loading...</div>
+<body style="background-color: rgba(0,0,0,0);">
 
-	<script src="js/cloudRecognition.js"></script>
+    <div id ="header-status" data-role="header" data-position="fixed" data-theme="c">
+        <a href="javascript: World.switchCam();" data-icon="refresh" data-inline="true" data-mini="true">Switch Camera</a>
+        <h1></h1>
+    </div>
+    <div id="loadingMessage" class="info">Loading ...</div>
+
+    <div id="snapContainer"></div>
+	<script src="js/3dModel.js"></script>
+
+	<!--<script src="js/cloudRecognition.js"></script>-->
+
 </body>
 </html>
